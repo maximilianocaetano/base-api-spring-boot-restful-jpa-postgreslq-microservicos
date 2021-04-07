@@ -12,6 +12,7 @@
 	<groupId>curso.api.rest</groupId>
 	<artifactId>cursospringrestapi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>cursospringrestapi</name>
 	<description>Curso API  REST spring boot</description>
 	<properties>
@@ -37,8 +38,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-rest</artifactId>
@@ -59,9 +58,6 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.4.1212</version>
 		</dependency>
-
-
-
 
 	</dependencies>
 
