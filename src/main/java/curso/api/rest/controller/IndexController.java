@@ -42,8 +42,12 @@ public class IndexController {
 
 	}
 
-	@PostMapping(value = "/")
+	@PostMapping(value = "/", produces = "application/json")
 	public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
+		
+		for(int pos = 0; pos < usuario.getTelefones().size(); pos ++) {
+			usuario.getTelefones().get(pos).setUsuario(usuario);
+		}
 
 		Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
@@ -68,13 +72,6 @@ public class IndexController {
 		return new ResponseEntity("Venda Atualizada com sucesso!!!", HttpStatus.OK);
 	}
 	
-	@PutMapping(value = "/",produces = "application/json")	
-	public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario) {
-		
-		Usuario usuarioSalvo = usuarioRepository.save(usuario);
-		
-		return new ResponseEntity<Usuario>(usuarioSalvo, HttpStatus.OK);
-	}
 	
 	@ResponseBody
 	@GetMapping(value = "/{id}", produces = "application/json")
@@ -100,6 +97,17 @@ public class IndexController {
 		
 		return "delete venda";
 
+	}
+	@PutMapping(value = "/",produces = "application/json")	
+	public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario) {
+		
+		for(int pos = 0; pos < usuario.getTelefones().size(); pos ++) {
+			usuario.getTelefones().get(pos).setUsuario(usuario);
+		}
+
+		Usuario usuarioSalvo = usuarioRepository.save(usuario);
+		
+		return new ResponseEntity<Usuario>(usuarioSalvo, HttpStatus.OK);
 	}
 
 
