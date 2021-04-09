@@ -12,12 +12,12 @@
 	<groupId>curso.api.rest</groupId>
 	<artifactId>cursospringrestapi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>cursospringrestapi</name>
 	<description>Curso API  REST spring boot</description>
 	<properties>
 		<java.version>11</java.version>
-		<maven.test.skip>true</maven.test.skip>
+		<!-- <maven.test.skip>true</maven.test.skip> -->
 	</properties>
 	<dependencies>
 		<dependency>
