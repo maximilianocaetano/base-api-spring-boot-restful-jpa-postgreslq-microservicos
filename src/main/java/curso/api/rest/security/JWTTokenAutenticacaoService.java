@@ -1,7 +1,9 @@
 package curso.api.rest.security;
 
+import java.io.IOException;
 import java.util.Date;
 
+import javax.imageio.IIOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,7 +29,7 @@ public class JWTTokenAutenticacaoService {
 	
 	private static final String HEADER_STRING = "Authorization";
 	
-	public void addAuthetication(HttpServletResponse response, String username)throws Exception {
+	public void addAuthetication(HttpServletResponse response, String username)throws IOException {
 		
 		String JWT = Jwts.builder().setSubject(username)
 				                   .setExpiration(new Date(System.currentTimeMillis()+ 
