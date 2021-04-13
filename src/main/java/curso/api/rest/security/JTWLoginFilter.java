@@ -21,14 +21,18 @@ import curso.api.rest.model.Usuario;
 public class JTWLoginFilter extends AbstractAuthenticationProcessingFilter{
 	
 	protected JTWLoginFilter(String url, AuthenticationManager authenticationManager) {
+		
 		super(new AntPathRequestMatcher(url));
+		
 		setAuthenticationManager(authenticationManager);		
 	}
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
 			
-		Usuario user = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);		
+		Usuario user = new ObjectMapper()
+				       .readValue(request.getInputStream(),
+				        Usuario.class);		
 					
 		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getSenha()));
 		

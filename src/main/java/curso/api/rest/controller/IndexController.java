@@ -3,9 +3,14 @@ package curso.api.rest.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import curso.api.rest.model.Usuario;
 import curso.api.rest.repository.UsuarioRepository;
-
 
 @RestController
 @RequestMapping(value = "/usuario")
@@ -38,8 +42,12 @@ public class IndexController {
 	}
 
 	@GetMapping(value = "/", produces = "application/json")
-	public ResponseEntity<List<Usuario>> usuario() {
+	@CacheEvict(value = "cacheusuarios", allEntries = true)
+	@CachePut("cacheusuarios")
+	public ResponseEntity<List<Usuario>> usuario() throws InterruptedException {
 		List<Usuario> list = (List<Usuario>) usuarioRepository.findAll();
+		
+		
 		return new ResponseEntity<List<Usuario>>(list, HttpStatus.OK);
 
 	}
@@ -51,6 +59,8 @@ public class IndexController {
 			usuario.getTelefones().get(pos).setUsuario(usuario);
 		}
 
+		String senhacriptografada = new BCryptPasswordEncoder().encode(usuario.getSenha());
+		usuario.setSenha(senhacriptografada);
 		Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
 		return new ResponseEntity<Usuario>(usuarioSalvo, HttpStatus.OK);
@@ -59,30 +69,38 @@ public class IndexController {
 	
 	@PostMapping(value = "/{iduser}/idvenda/{idvenda}")
 	public ResponseEntity<Usuario> cadastrarvenda(@PathVariable Long iduser, @PathVariable Long idvenda) {
-
 		// Usuario usuarioSalvo = usuarioRepository.save(usuario);
-
 		return new ResponseEntity("id user: " + iduser + " idvenda: " + idvenda, HttpStatus.OK);
 	}
 	
 	@PutMapping(value = "/{iduser}/idvenda/{idvenda}")
 	public ResponseEntity<Usuario> updatevenda(@PathVariable Long iduser,
 			                                   @PathVariable Long idvenda) {
-
 		// Usuario usuarioSalvo = usuarioRepository.save(usuario);
-
 		return new ResponseEntity("Venda Atualizada com sucesso!!!", HttpStatus.OK);
 	}
 	
 	
-	@ResponseBody
-	@GetMapping(value = "/{id}", produces = "application/json")
-	public ResponseEntity<Usuario> init(@PathVariable (value = "id") Long id){
+	@GetMapping(value = "/{id}", produces = "application/json", headers = "X-API-Version=v1")
+	@CacheEvict(value = "cacheusuarios", allEntries = true)
+	@CachePut("cacheusuarios")
+	public ResponseEntity<Usuario> initV1(@PathVariable (value = "id") Long id){
 		
 		Optional<Usuario> usuario = usuarioRepository.findById(id);
+		//System.out.println("Executando versao 1");
 		
 		return new ResponseEntity<Usuario>(usuario.get(), HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/{id}", produces = "application/json", headers = "X-API-Version=v2")
+	public ResponseEntity<Usuario> initV2(@PathVariable (value = "id") Long id){
+		
+		Optional<Usuario> usuario = usuarioRepository.findById(id);
+		//System.out.println("Executando versao 2");
+		
+		return new ResponseEntity<Usuario>(usuario.get(), HttpStatus.OK);
+	}
+	
 	
 	@DeleteMapping(value = "/{id}", produces = "application/text")
 	public String delete(@PathVariable("id") Long id) {
@@ -105,6 +123,13 @@ public class IndexController {
 		
 		for(int pos = 0; pos < usuario.getTelefones().size(); pos ++) {
 			usuario.getTelefones().get(pos).setUsuario(usuario);
+		}
+		
+		Usuario userTemporario = usuarioRepository.findByLogin(usuario.getLogin());
+		
+		if(!userTemporario.getSenha().equals(usuario)) {
+			String senhacriptografada = new BCryptPasswordEncoder().encode(usuario.getSenha());
+			usuario.setSenha(senhacriptografada);
 		}
 
 		Usuario usuarioSalvo = usuarioRepository.save(usuario);
